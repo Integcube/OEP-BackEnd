@@ -1,0 +1,169 @@
+using ActionTrakingSystem.DTOs;
+using ActionTrakingSystem.Model;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using System.Threading.Tasks;
+using System;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
+namespace ActionTrakingSystem.Controllers
+{
+
+    public class PBIRunningHoursController : BaseAPIController
+    {
+        private readonly DAL _context;
+        public PBIRunningHoursController(DAL context)
+        {
+            _context = context;
+        }
+        [HttpGet("getTimeLine")]
+        public async Task<IActionResult> GetTimeLine()
+        {
+            try
+            {
+                List<PBIRunningHoursSitesDto> t = new List<PBIRunningHoursSitesDto>();
+
+                var timeline = await (from a in _context.SiteEquipment.Where(a => a.isDeleted == 0)
+                                      join s in _context.Sites.Where(a => a.isDeleted == 0) on a.siteId equals s.siteId
+                                      join sh in _context.WH_StartingHours.Where(a => a.isDeleted == 0) on a.equipmentId equals sh.unitId
+                                      join mh in _context.WH_MonthlyHours on sh.startingId equals mh.startingHourId
+                                      select new
+                                      {
+                                          a.siteId,
+                                          s.siteName,
+                                          a.equipmentId,
+                                          a.unit,
+                                          sh.startDate,
+                                          sh.startHours,
+                                          mh.yearId,
+                                          mh.runningHour,
+                                          mh.monthId,
+                                          s.onmContractExpiry,
+                                      }).ToListAsync();
+
+                var outages = await (from a in _context.SiteEquipment
+                                     join ot in _context.WH_SiteNextOutages.Where(a => a.isDeleted == 0) on a.equipmentId equals ot.equipmentId
+                                     join it in _context.WH_ISiteOutages on ot.outageId equals it.outageId
+                                     select new
+                                     {
+                                         a.siteId,
+                                         a.equipmentId,
+                                         a.unit,
+                                         ot.outageId,
+                                         it.outageTitle,
+                                         ot.runningHours,
+                                         ot.nextOutageDate,
+                                         it.colorCode,
+                                         counter = -1.0m,
+                                         validate = ""
+                                     }).ToListAsync();
+                var uniqueSites = timeline.Select(a => new
+                {
+                    a.siteId,
+                    a.siteName
+                }).Distinct().ToList();
+
+                for (var i = 0; i < uniqueSites.Count; i++)
+                {
+                    t = new List<PBIRunningHoursSitesDto>();
+                    PBIRunningHoursSitesDto rh = new PBIRunningHoursSitesDto();
+                    rh.siteId = (int)uniqueSites[i].siteId;
+                    rh.siteName = uniqueSites[i].siteName;
+                    rh.eqps = new List<PBIRunningHoursEqpDto>();
+                    List<PBIRunningHoursEqpDto> eqList = new List<PBIRunningHoursEqpDto>();
+                    var uniqueEquipments = timeline.Select(a => new
+                    {
+                        a.siteId,
+                        a.equipmentId,
+                        a.unit,
+                        a.startDate,
+                        a.startHours,
+                        a.onmContractExpiry,
+                    }).Distinct().Where(a => a.siteId == (int)uniqueSites[i].siteId).ToList();
+
+                    for (var j = 0; j < uniqueEquipments.Count; j++)
+                    {
+                        var outagesList = outages.Select(a => new imutableProps
+                        {
+                            outageTitle = a.outageTitle,
+                            runningHours = (decimal)a.runningHours,
+                            nextOutageDate = a.nextOutageDate,
+                            colorCode = a.colorCode,
+                            counter = a.counter,
+                            equipmentId = a.equipmentId,
+                            validate = a.validate,
+                        }).Distinct().Where(a => a.equipmentId == uniqueEquipments[j].equipmentId).ToList();
+                        PBIRunningHoursEqpDto eq = new PBIRunningHoursEqpDto();
+                        eq.equipmentId = uniqueEquipments[j].equipmentId;
+                        eq.unit = uniqueEquipments[j].unit;
+                        eq.startDate = uniqueEquipments[j].startDate;
+                        eq.startHours = uniqueEquipments[j].startHours;
+                        eq.onmContractExpiry = uniqueEquipments[j].onmContractExpiry;
+                        eq.yearly = new List<PBIRunningHoursYearlyDto>();
+                        int differenceInYears = uniqueEquipments[j].onmContractExpiry.Year - uniqueEquipments[j].startDate.Year;
+                        List<int> yearList = new List<int>();
+                        var d = 0;
+                        for (var za = 0; za < differenceInYears; za++)
+                        {
+                            d = uniqueEquipments[j].startDate.Year + za + 1;
+                            yearList.Add(d);
+                            d = 0;
+                        }
+                        decimal yearlyCounter = uniqueEquipments[j].startHours;
+                        for (var k = 0; k < yearList.Count; k++)
+                        {
+                            PBIRunningHoursYearlyDto yd = new PBIRunningHoursYearlyDto();
+                            yd.outages = new List<PBIRunningHoursOuatgesDto>();
+                            var yearlyTotalList = timeline.Select(a => new
+                            {
+                                a.equipmentId,
+                                a.yearId,
+                                a.runningHour,
+                                a.monthId,
+                            }).Distinct().Where(a => a.yearId == (int)yearList[i] && a.equipmentId == uniqueEquipments[j].equipmentId).ToList();
+
+                            for (var l = 0; l < yearlyTotalList.Count; l++)
+                            {
+                                yearlyCounter += yearlyTotalList[l].runningHour;
+
+                                for (var p = 0; p < outagesList.Count; p++)
+                                {
+                                    if (outagesList[p].counter == -1)
+                                    {
+                                        outagesList[p].counter = yearlyCounter;
+                                    }
+                                    else
+                                    {
+                                        outagesList[p].counter += yearlyTotalList[l].runningHour;
+                                    }
+                                    if ((outagesList[p].runningHours != null && outagesList[p].runningHours <= outagesList[p].counter && yearlyTotalList[l].monthId == 12) || ( outagesList[p].nextOutageDate.Year == yearList[i] && yearlyTotalList[l].monthId == 12 && outagesList[p].validate != "NoValidate"))
+                                    {
+                                        PBIRunningHoursOuatgesDto o = new PBIRunningHoursOuatgesDto();
+                                        o.outageTitle = outagesList[p].outageTitle;
+                                        yd.outages.Add(o);
+                                        outagesList[p].validate = "NoValidate";
+                                        outagesList[p].counter = 0;
+                                    }
+                                }
+                            }
+                            yd.yearId = (int)yearList[k];
+                            yd.yearlyTotal = yearlyCounter;
+                            eq.yearly.Add(yd);
+                        }
+                        rh.eqps.Add(eq);
+                    }
+                    t.Add(rh);
+                }
+                return Ok(t);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+    }
+}
