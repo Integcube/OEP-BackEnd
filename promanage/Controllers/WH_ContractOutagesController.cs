@@ -26,12 +26,13 @@ namespace ActionTrakingSystem.Controllers
             {
                 var siteOutages = await (from a in _context.WH_ContractOutages.Where(a => a.isDeleted == 0 && reg.filter.outageId == -1 || a.outageId == reg.filter.outageId)
                                          join e in _context.WH_SiteEquipment.Where(a=> a.isDeleted == 0 && (reg.filter.equipmentId == -1 || a.equipmentId == reg.filter.equipmentId)) on a.equipmentId equals e.equipmentId                             
-                                         join s in _context.Sites.Where(a => reg.filter.siteId == -1 || a.siteId == reg.filter.siteId) on e.siteId equals s.siteId
+                                         join s in _context.Sites.Where(a => (reg.filter.siteId == -1 || a.siteId == reg.filter.siteId) && ( reg.filter.clusterId == -1 || a.clusterId == reg.filter.clusterId)) on e.siteId equals s.siteId
                                          join ts in _context.SitesTechnology.Where(a => a.isDeleted == 0) on s.siteId equals ts.siteId
                                          join aus in _context.AUSite.Where(a => a.userId == reg.userId) on s.siteId equals aus.siteId
                                          join aut in _context.AUTechnology.Where(a => a.userId == reg.userId) on ts.techId equals aut.technologyId
                                          join ot in _context.WH_ISiteOutages on a.outageId equals ot.outageId
                                          join r in _context.Regions.Where(a => reg.filter.regionId == -1 || a.regionId == reg.filter.regionId) on s.regionId equals r.regionId
+                                         join clus in _context.Cluster on s.clusterId equals clus.clusterId
                                          select new
                                          {
                                              a.contractOutageId,
@@ -44,7 +45,8 @@ namespace ActionTrakingSystem.Controllers
                                              e.siteUnit,
                                              ot.outageId,
                                              outageTitle = ot.outageTitle,
-                                             nextOutageDate = a.nextOutageDate
+                                             nextOutageDate = a.nextOutageDate,
+                                             cluster=clus.clusterTitle,
                                          }
                                         ).Distinct().OrderByDescending(a => a.contractOutageId).ToListAsync();
                 return Ok(siteOutages);

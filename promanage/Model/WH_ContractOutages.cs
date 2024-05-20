@@ -28,5 +28,7 @@ namespace ActionTrakingSystem.Model
         public int siteId { get; set; }
         public int equipmentId { get; set; }
         public int outageId { get; set; }
+        public int clusterId { get; set; }
+        
     }
 }
