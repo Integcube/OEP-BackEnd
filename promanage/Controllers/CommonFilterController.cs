@@ -174,7 +174,7 @@ namespace ActionTrakingSystem.Controllers
         {
             try
             {
-                var sites = await (from s in _context.Sites.Where(a => a.isDeleted == 0 && (a.regionId == reg.regionId || reg.regionId == -1))
+                var sites = await (from s in _context.Sites.Where(a => a.isDeleted == 0 && (a.regionId == reg.regionId || reg.regionId == -1) && (a.clusterId == reg.clusterId || reg.clusterId == -1))
                                    join r in _context.Regions on s.regionId equals r.regionId
                                    join stech in _context.SitesTechnology on s.siteId equals stech.siteId
                                    join aus in _context.AUSite.Where(a => a.userId == reg.userId || reg.userId == -1) on s.siteId equals aus.siteId

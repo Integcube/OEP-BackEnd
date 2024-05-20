@@ -70,7 +70,7 @@ namespace ActionTrakingSystem.Controllers
                 DateTime totdayDate = DateTime.Now;
                 var outages = await (from a in _context.WH_SiteNextOutages.Where(a => a.isDeleted == 0 && a.nextOutageDate.Date >= totdayDate.Date)
                                      join e in _context.WH_SiteEquipment on a.equipmentId equals e.equipmentId
-                                     join s in _context.Sites on e.siteId equals s.siteId
+                                     join s in _context.Sites.Where(a=> (reg.filterObj.clusterId == -1 || a.clusterId == reg.filterObj.clusterId)) on e.siteId equals s.siteId
                                      join o in _context.WH_ISiteOutages on a.outageId equals o.outageId
                                      select new
                                      {
@@ -92,7 +92,7 @@ namespace ActionTrakingSystem.Controllers
                 }).ToList();
 
                 var siteEquipment = await (from se in _context.WH_SiteEquipment.Where(a => a.isDeleted == 0 && (reg.filterObj.modelId == -1 || a.fleetEquipmentId == reg.filterObj.modelId) && (reg.filterObj.siteId == -1 || a.siteId == reg.filterObj.siteId))
-                                           join s in _context.Sites on se.siteId equals s.siteId
+                                           join s in _context.Sites.Where(a => (reg.filterObj.clusterId == -1 || a.clusterId == reg.filterObj.clusterId)) on se.siteId equals s.siteId
                                            join stech in _context.SitesTechnology on s.siteId equals stech.siteId
                                            join aus in _context.AUSite.Where(a => a.userId == reg.userId) on s.siteId equals aus.siteId
                                            join aut in _context.AUTechnology.Where(a => a.userId == reg.userId) on stech.techId equals aut.technologyId
@@ -103,6 +103,7 @@ namespace ActionTrakingSystem.Controllers
                                            join fe in _context.ModelEquipmentOEM.Where(a => (reg.filterObj.oemId == -1 || a.oemId == reg.filterObj.oemId)) on md.oemId equals fe.oemId
                                            join u in _context.AppUser on se.responsible equals u.userId into all5
                                            from ee in all5.DefaultIfEmpty()
+                                           join clus in _context.Cluster on s.clusterId equals clus.clusterId
                                            select new
                                            {
                                                equipmentId = se.equipmentId,
@@ -121,6 +122,7 @@ namespace ActionTrakingSystem.Controllers
                                                responsibleName = ee.userName,
                                                unitCOD = se.unitCOD,
                                                unit = se.unit,
+                                               cluster=  clus.clusterTitle,
                                            }).Distinct().OrderByDescending(z => z.equipmentId).ToListAsync();
 
 
@@ -147,8 +149,8 @@ namespace ActionTrakingSystem.Controllers
                                  s.oemTitle,
                                  outageTypeId = ot == null ? -1 : ot.outageTypeId,
                                  nextOutage = ot?.nextOutageDate,
-                                 outageType = ot == null ? "" : ot.title
-
+                                 outageType = ot == null ? "" : ot.title,
+                                 s.cluster,
 
                              }).ToList();
 
