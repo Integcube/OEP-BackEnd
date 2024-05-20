@@ -366,7 +366,7 @@ namespace ActionTrakingSystem.Controllers
             try
             {
                 var timeline = await (from r in _context.Regions2.Where(a => a.isDeleted == 0 && (reg.regionId == -1 || a.regionId == reg.regionId))
-                                      join s in _context.Sites.Where(a => a.isDeleted == 0 && (reg.siteId == -1|| a.siteId == reg.siteId)) on r.regionId equals s.region2
+                                      join s in _context.Sites.Where(a => a.isDeleted == 0 && (reg.siteId == -1|| a.siteId == reg.siteId) && (reg.clusterId == -1 || a.clusterId == reg.clusterId)) on r.regionId equals s.region2
                                       join e in _context.WH_SiteEquipment.Where(a => a.isDeleted == 0 && (reg.unitId == -1 || a.equipmentId == reg.unitId)) on s.siteId equals e.siteId
                                       join sh in _context.WH_StartingHours.Where(a => a.isDeleted == 0) on e.equipmentId equals sh.unitId
                                       join mh in _context.WH_MonthlyHours on sh.unitId equals mh.unitId

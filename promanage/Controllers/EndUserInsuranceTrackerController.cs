@@ -625,6 +625,7 @@ namespace ActionTrakingSystem.Controllers
                                          actionClosedTitle = uxxx.firstName + " " + uxxx.lastName,
                                      }
                  ).Distinct().OrderByDescending(a => a.insurenceActionTrackerId).ToListAsync();
+            
                 var daysToTargetList = tracker.Select(s => new
                 {
                     s.documentTypeTitle,
