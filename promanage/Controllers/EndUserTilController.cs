@@ -486,7 +486,7 @@ namespace ActionTrakingSystem.Controllers
                                     from bb in allzz2.DefaultIfEmpty()
                                     join outage in _context.OutageTypes on tap.outageId equals outage.outageTypeId into allzz3
                                     from cc in allzz3.DefaultIfEmpty()
-                                    join tapeq in _context.TAPEquipment on tap.packageId equals tapeq.tapId
+                                    join tapeq in _context.TAPEquipment on tap.packageId equals tapeq.tapId //
                                     join az in _context.TILActionTracker on new { tap.packageId, tapeq.eqId } equals new { packageId = az.tapId, eqId = az.siteEquipmentId } into allz
                                     from a in allz.DefaultIfEmpty()
                                     join tils in _context.TILBulletin.Where(a => (a.isDeleted == 0) && ((FocusIds.Count == 0) || FocusIds.Contains((int)a.focusId)) && ((SeveruityIds.Count == 0) || SeveruityIds.Contains((int)a.oemSeverityId))) on tap.tilId equals tils.tilId

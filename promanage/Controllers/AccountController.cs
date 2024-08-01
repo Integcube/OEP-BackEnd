@@ -89,5 +89,29 @@ namespace ActionTrakingSystem.Controllers
             }
 
         }
+
+        [HttpGet("apiTest")]
+        public async Task<IActionResult> ApiTest()
+        {
+            try
+            {
+                var user = await (from a in _context.AppUser.Where(a=>a.isDeleted==1)
+                                  select a).ToListAsync();
+                if (user != null)
+                {
+                  
+                    return Ok(user);
+                }
+                else
+                {
+                    return Ok(0);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

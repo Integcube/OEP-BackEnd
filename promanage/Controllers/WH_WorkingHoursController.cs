@@ -28,11 +28,12 @@ namespace ActionTrakingSystem.Controllers
             {
                 var workingEq = await (from a in _context.WH_StartingHours.Where(a => a.isDeleted == 0)
                                        join se in _context.WH_SiteEquipment.Where(a => a.isDeleted == 0 && (reg.filter.equipmentId == -1 || a.equipmentId == reg.filter.equipmentId)) on a.unitId equals se.equipmentId
-                                       join s in _context.Sites.Where(a => reg.filter.siteId == -1 || a.siteId == reg.filter.siteId) on se.siteId equals s.siteId
+                                       join s in _context.Sites.Where(a => (reg.filter.siteId == -1 || a.siteId == reg.filter.siteId) && (reg.filter.clusterId == -1 || a.clusterId == reg.filter.clusterId)) on se.siteId equals s.siteId
                                        join r in _context.Regions.Where(a => reg.filter.regionId == -1 || a.regionId == reg.filter.regionId) on s.regionId equals r.regionId
                                        join ts in _context.SitesTechnology.Where(a => a.isDeleted == 0) on s.siteId equals ts.siteId
                                        join aus in _context.AUSite.Where(a => a.userId == reg.userId) on s.siteId equals aus.siteId
                                        join aut in _context.AUTechnology.Where(a => a.userId == reg.userId) on ts.techId equals aut.technologyId
+                                       join clus in _context.Cluster on s.clusterId equals clus.clusterId
                                        select new
                                        {
                                            a.startingId,
@@ -46,7 +47,8 @@ namespace ActionTrakingSystem.Controllers
                                            a.startHours,
                                            a.startDate,
                                            s.onmContractExpiry,
-                                           a.wceHours
+                                           a.wceHours,
+                                           cluster = clus.clusterTitle
                                        }).Distinct().OrderByDescending(a => a.startingId).ToListAsync();
                 return Ok(workingEq);
             }
@@ -238,20 +240,37 @@ namespace ActionTrakingSystem.Controllers
                                               monthId = a.monthId
                                           }
                                          ).OrderBy(a => a.monthId).ToListAsync();
+
                 var calcStartingHours = monthlyHours.Select(a => new
                 {
                     a.runningHours,
                     a.reduceHours,
                     a.yearId,
                     a.fromCoe,
-                }).Where(a => a.yearId < reg.yearId).ToList();
+                    a.monthId,
+                }).Where(a => a.yearId < reg.yearId).OrderBy(a=>a.yearId).ThenBy(a=>a.monthId).ToList();
+
                 decimal monthlyTotal = reg.result.startHours;
+                decimal monthlyTotal2 = reg.result.startHours;
+
                 for (var i = 0; i < calcStartingHours.Count; i++)
                 {
-                    monthlyTotal += calcStartingHours[i].runningHours - calcStartingHours[i].reduceHours;
+
+                    if (i > 0)
+                    {
+                        decimal difference = calcStartingHours[i].runningHours - calcStartingHours[i-1].runningHours;
+                        monthlyTotal += calcStartingHours[i].fromCoe == 1 ? difference : (calcStartingHours[i].runningHours);
+                    }
+                    else
+                    {
+                        monthlyTotal += calcStartingHours[i].runningHours - calcStartingHours[i].reduceHours;
+                    }
+
+                    monthlyTotal2 += calcStartingHours[i].runningHours - calcStartingHours[i].reduceHours;
                 }
                 var startHours = monthlyTotal;
 
+              
                 var monthlyHours2 = monthlyHours.Select(a => new
                 {
                     a.runningHours,
@@ -259,8 +278,10 @@ namespace ActionTrakingSystem.Controllers
                     a.yearId,
                     a.monthId,
                     a.fromCoe,
-                }).Where(a => a.yearId == reg.yearId).ToList();
+                }).Where(a => a.yearId == reg.yearId).OrderBy(a => a.yearId).ThenBy(a => a.monthId).ToList();
+
                 List<WH_MonthlyModel> monthlyList = new List<WH_MonthlyModel>();
+
                 decimal yearltCount = 0;
                 if (monthlyHours2.Count == 0)
                 {
@@ -286,7 +307,16 @@ namespace ActionTrakingSystem.Controllers
                         monthlyModel.fromCoe = monthlyHours2[i].fromCoe;
                         monthlyModel.monthId = monthlyHours2[i].monthId;
                         monthlyModel.yearId = reg.yearId;
-                        monthlyTotal += monthlyHours2[i].runningHours - monthlyHours2[i].reduceHours;
+                        if (i > 0)
+                        {
+                            decimal difference = monthlyHours2[i].runningHours - monthlyHours2[i-1].runningHours;
+                            monthlyTotal += monthlyHours2[i].fromCoe == 1 ? difference : (monthlyHours2[i].runningHours - monthlyHours2[i].reduceHours);
+                        }
+                        else
+                        {
+                            monthlyTotal += monthlyHours2[i].runningHours - monthlyHours2[i].reduceHours;
+                        }
+
                         monthlyModel.monthlyTotal = monthlyTotal;
                         monthlyList.Add(monthlyModel);
 
@@ -366,7 +396,7 @@ namespace ActionTrakingSystem.Controllers
             try
             {
                 var timeline = await (from r in _context.Regions2.Where(a => a.isDeleted == 0 && (reg.regionId == -1 || a.regionId == reg.regionId))
-                                      join s in _context.Sites.Where(a => a.isDeleted == 0 && (reg.siteId == -1|| a.siteId == reg.siteId)) on r.regionId equals s.region2
+                                      join s in _context.Sites.Where(a => a.isDeleted == 0 && (reg.siteId == -1|| a.siteId == reg.siteId) && (reg.clusterId == -1 || a.clusterId == reg.clusterId)) on r.regionId equals s.region2
                                       join e in _context.WH_SiteEquipment.Where(a => a.isDeleted == 0 && (reg.unitId == -1 || a.equipmentId == reg.unitId)) on s.siteId equals e.siteId
                                       join sh in _context.WH_StartingHours.Where(a => a.isDeleted == 0) on e.equipmentId equals sh.unitId
                                       join mh in _context.WH_MonthlyHours on sh.unitId equals mh.unitId
@@ -384,6 +414,7 @@ namespace ActionTrakingSystem.Controllers
                                           e.eqType,
                                           mh.monthId,
                                           s.onmContractExpiry,
+                                          mh.fromCoe
                                       }).ToListAsync();
 
 

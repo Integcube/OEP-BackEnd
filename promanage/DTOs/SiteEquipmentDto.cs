@@ -28,6 +28,7 @@ namespace ActionTrakingSystem.DTOs
         public string modelList { get; set; }
         public string eqTypeList { get; set; }
         public string oemList { get; set; }
+  
     }
     public class SiteEquipmentFilterDto
     {
@@ -37,6 +38,7 @@ namespace ActionTrakingSystem.DTOs
         public int? siteId { get; set; } = -1;
         public int? modelId { get; set; } = -1;
         public int? fleetEquipId { get; set; } = -1;
+        public int clusterId { get; set; } = -1;
     }
     public class SiteEquipmentSaveDto
     {

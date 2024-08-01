@@ -2,6 +2,7 @@
 using ActionTrakingSystem.DTOs;
 using ActionTrakingSystem.Model;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace ActionTrakingSystem.Model
 {
@@ -13,6 +14,11 @@ namespace ActionTrakingSystem.Model
             modelBuilder.Entity<TilDetailReportDto>().HasNoKey();
             modelBuilder.Entity<TilActionReportDto>().HasNoKey();
             modelBuilder.Entity<InsuranceRecommendatioSpDto>().HasNoKey();
+            modelBuilder.Entity<ProjectPlanTaskDtoSp>().HasNoKey();
+            modelBuilder.Entity<AssignTaskDTO>().HasNoKey();
+            modelBuilder.Entity<ProjectExeTask>().HasNoKey();
+            modelBuilder.Entity<ProjectReadinessDTO>().HasNoKey();
+            
             base.OnModelCreating(modelBuilder);
             
         }
@@ -168,5 +174,26 @@ namespace ActionTrakingSystem.Model
         public DbSet<KPI_SiteInfo> KPI_SiteInfo { get; set; }
         public DbSet<TilActionReportDto> TilActionReportDto { get; set; }
 
+        //Project plan
+        public DbSet<ProjectPlan> ProjectPlan { get; set; }
+        public DbSet<ProjectPlanTask> ProjectPlanTask { get; set; }
+        public DbSet<ProjectPhase> ProjectPhase { get; set; }
+        public DbSet<ProjectPlanTaskDtoSp> ProjectPlanTaskDtoSp { get; set; }
+        public DbSet<ProjectStartPlan> ProjectStartPlan { get; set; }
+        public DbSet<AssignTaskDTO> AssignTaskDTO { get; set; }
+        public DbSet<ProjectStartPhase> ProjectStartPhase { get; set; }
+        public DbSet<ProjectTaskAssignment> ProjectTaskAssignment { get; set; }
+        public DbSet<Project_PredecessorType> Project_PredecessorType { get; set; }
+        public DbSet<ProjectKeyIssues> ProjectKeyIssues { get; set; }
+        public DbSet<ProjectExeTask> ProjectExeTask { get; set; }
+        public DbSet<ProjectManpowerPlanData> ProjectManpowerPlanData { get; set; }
+        public DbSet<ProjectManpowerPosition> ProjectManpowerPosition { get; set; }
+        public DbSet<ProjectKeyIssuesDocument> ProjectKeyIssuesDocument { get; set; }
+        public DbSet<ProjectReadinessPhase> ProjectReadinessPhase { get; set; }
+        public DbSet<ProjectReadinessChecklist> ProjectReadinessChecklist { get; set; }
+        public DbSet<ProjectReadiness> ProjectReadiness { get; set; }
+        public DbSet<ProjectReadinessDTO> ProjectReadinessDTO { get; set; }
+        public DbSet<ProjectReadinessDocument> ProjectReadinessDocument { get; set; }
+        
     }
 }
