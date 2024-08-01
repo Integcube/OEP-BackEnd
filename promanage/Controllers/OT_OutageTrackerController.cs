@@ -281,59 +281,59 @@ namespace ActionTrakingSystem.Controllers
                                     }).Distinct().ToList();
 
                 var actions = combinedUser
-.GroupBy(k => new
-{
-    k.siteId,
-    k.siteTitle,
-    k.phaseId,
-    k.phaseNumber,
-    k.phaseTitle,
-    k.phaseReadId,
-    k.phaseReadDesc,
-    k.clusterId,
-    k.clusterTitle,
-    k.notApplicable,
-    k.statusId,
-    k.statusTitle,
-    k.potId,
-    k.snoId,
-    k.outageId,
-    k.nextOutageDate,
-    k.outageTitle,
-    k.phaseDurId,
-    k.durationMonths,
-    k.equipmentId,
-    k.unit,
-    k.startDate,
-    k.endDate
-})
-.Select(group => new OutageTrackerModel
-{
-    siteId = group.FirstOrDefault().siteId,
-    siteTitle = group.FirstOrDefault().siteTitle,
-    phaseId = group.FirstOrDefault().phaseId,
-    phaseNumber = group.FirstOrDefault().phaseNumber,
-    phaseTitle = group.FirstOrDefault().phaseTitle,
-    phaseReadId = group.FirstOrDefault().phaseReadId,
-    phaseReadDesc = group.FirstOrDefault().phaseReadDesc,
-    clusterId = group.FirstOrDefault().clusterId,
-    clusterTitle = group.FirstOrDefault().clusterTitle,
-    notApplicable = group.FirstOrDefault().notApplicable,
-    statusId = group.FirstOrDefault().statusId,
-    statusTitle = group.FirstOrDefault().statusTitle,
-    potId = group.FirstOrDefault().potId,
-    snoId = group.FirstOrDefault().snoId,
-    outageId = group.FirstOrDefault().outageId,
-    nextOutageDate = group.FirstOrDefault().nextOutageDate,
-    outageTitle = group.FirstOrDefault().outageTitle,
-    phaseDurId = group.FirstOrDefault().phaseDurId,
-    durationMonths = group.FirstOrDefault().durationMonths,
-    equipmentId = group.FirstOrDefault().equipmentId,
-    unit = group.FirstOrDefault().unit,
-    startDate = group.FirstOrDefault().startDate,
-    endDate = group.FirstOrDefault().endDate,
-    name = string.Join(", ", group.Select(u => u.userName).Distinct())
-}).ToList();
+                 .GroupBy(k => new
+                 {
+                     k.siteId,
+                     k.siteTitle,
+                     k.phaseId,
+                     k.phaseNumber,
+                     k.phaseTitle,
+                     k.phaseReadId,
+                     k.phaseReadDesc,
+                     k.clusterId,
+                     k.clusterTitle,
+                     k.notApplicable,
+                     k.statusId,
+                     k.statusTitle,
+                     k.potId,
+                     k.snoId,
+                     k.outageId,
+                     k.nextOutageDate,
+                     k.outageTitle,
+                     k.phaseDurId,
+                     k.durationMonths,
+                     k.equipmentId,
+                     k.unit,
+                     k.startDate,
+                     k.endDate
+                 })
+                       .Select(group => new OutageTrackerModel
+                       {
+                           siteId = group.FirstOrDefault().siteId,
+                           siteTitle = group.FirstOrDefault().siteTitle,
+                           phaseId = group.FirstOrDefault().phaseId,
+                           phaseNumber = group.FirstOrDefault().phaseNumber,
+                           phaseTitle = group.FirstOrDefault().phaseTitle,
+                           phaseReadId = group.FirstOrDefault().phaseReadId,
+                           phaseReadDesc = group.FirstOrDefault().phaseReadDesc,
+                           clusterId = group.FirstOrDefault().clusterId,
+                           clusterTitle = group.FirstOrDefault().clusterTitle,
+                           notApplicable = group.FirstOrDefault().notApplicable,
+                           statusId = group.FirstOrDefault().statusId,
+                           statusTitle = group.FirstOrDefault().statusTitle,
+                           potId = group.FirstOrDefault().potId,
+                           snoId = group.FirstOrDefault().snoId,
+                           outageId = group.FirstOrDefault().outageId,
+                           nextOutageDate = group.FirstOrDefault().nextOutageDate,
+                           outageTitle = group.FirstOrDefault().outageTitle,
+                           phaseDurId = group.FirstOrDefault().phaseDurId,
+                           durationMonths = group.FirstOrDefault().durationMonths,
+                           equipmentId = group.FirstOrDefault().equipmentId,
+                           unit = group.FirstOrDefault().unit,
+                           startDate = group.FirstOrDefault().startDate,
+                           endDate = group.FirstOrDefault().endDate,
+                           name = string.Join(", ", group.Select(u => u.userName).Distinct())
+                       }).ToList();
 
 
                 var todayDate = DateTime.Now;

@@ -278,7 +278,7 @@ namespace ActionTrakingSystem.Controllers
                                          userId = d.userId,
                                          email = d.email,
                                          fullName = d.lastName + " " + d.middleName + " " + d.lastName
-                                     }).Distinct().ToListAsync();
+                                     }).Distinct().OrderBy(a=>a.userName).ToArrayAsync();
 
                 var obj = new
                 {

@@ -35,7 +35,7 @@ namespace ActionTrakingSystem.Controllers
                                        name =s.firstName + " " + s.lastName,
                                        s.email,
                                    }
-                                  ).Distinct().ToListAsync();
+                                  ).Distinct().OrderBy(a=>a.name).ToListAsync();
 
                 return Ok(users);
             }

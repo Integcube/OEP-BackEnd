@@ -240,20 +240,37 @@ namespace ActionTrakingSystem.Controllers
                                               monthId = a.monthId
                                           }
                                          ).OrderBy(a => a.monthId).ToListAsync();
+
                 var calcStartingHours = monthlyHours.Select(a => new
                 {
                     a.runningHours,
                     a.reduceHours,
                     a.yearId,
                     a.fromCoe,
-                }).Where(a => a.yearId < reg.yearId).ToList();
+                    a.monthId,
+                }).Where(a => a.yearId < reg.yearId).OrderBy(a=>a.yearId).ThenBy(a=>a.monthId).ToList();
+
                 decimal monthlyTotal = reg.result.startHours;
+                decimal monthlyTotal2 = reg.result.startHours;
+
                 for (var i = 0; i < calcStartingHours.Count; i++)
                 {
-                    monthlyTotal += calcStartingHours[i].runningHours - calcStartingHours[i].reduceHours;
+
+                    if (i > 0)
+                    {
+                        decimal difference = calcStartingHours[i].runningHours - calcStartingHours[i-1].runningHours;
+                        monthlyTotal += calcStartingHours[i].fromCoe == 1 ? difference : (calcStartingHours[i].runningHours);
+                    }
+                    else
+                    {
+                        monthlyTotal += calcStartingHours[i].runningHours - calcStartingHours[i].reduceHours;
+                    }
+
+                    monthlyTotal2 += calcStartingHours[i].runningHours - calcStartingHours[i].reduceHours;
                 }
                 var startHours = monthlyTotal;
 
+              
                 var monthlyHours2 = monthlyHours.Select(a => new
                 {
                     a.runningHours,
@@ -261,8 +278,10 @@ namespace ActionTrakingSystem.Controllers
                     a.yearId,
                     a.monthId,
                     a.fromCoe,
-                }).Where(a => a.yearId == reg.yearId).ToList();
+                }).Where(a => a.yearId == reg.yearId).OrderBy(a => a.yearId).ThenBy(a => a.monthId).ToList();
+
                 List<WH_MonthlyModel> monthlyList = new List<WH_MonthlyModel>();
+
                 decimal yearltCount = 0;
                 if (monthlyHours2.Count == 0)
                 {
@@ -288,7 +307,16 @@ namespace ActionTrakingSystem.Controllers
                         monthlyModel.fromCoe = monthlyHours2[i].fromCoe;
                         monthlyModel.monthId = monthlyHours2[i].monthId;
                         monthlyModel.yearId = reg.yearId;
-                        monthlyTotal += monthlyHours2[i].runningHours - monthlyHours2[i].reduceHours;
+                        if (i > 0)
+                        {
+                            decimal difference = monthlyHours2[i].runningHours - monthlyHours2[i-1].runningHours;
+                            monthlyTotal += monthlyHours2[i].fromCoe == 1 ? difference : (monthlyHours2[i].runningHours - monthlyHours2[i].reduceHours);
+                        }
+                        else
+                        {
+                            monthlyTotal += monthlyHours2[i].runningHours - monthlyHours2[i].reduceHours;
+                        }
+
                         monthlyModel.monthlyTotal = monthlyTotal;
                         monthlyList.Add(monthlyModel);
 
@@ -386,6 +414,7 @@ namespace ActionTrakingSystem.Controllers
                                           e.eqType,
                                           mh.monthId,
                                           s.onmContractExpiry,
+                                          mh.fromCoe
                                       }).ToListAsync();
 
 
