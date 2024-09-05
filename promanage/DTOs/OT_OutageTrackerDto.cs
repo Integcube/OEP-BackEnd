@@ -101,7 +101,7 @@ namespace ActionTrakingSystem.DTOs
         public string remarks { get; set; }
         public string fileName { get; set; }
         public string userId { get; set; }
-
+        public string potId { get; set; }
 
     }
     public class OT_OutageTrackerDto

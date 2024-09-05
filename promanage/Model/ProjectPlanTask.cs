@@ -27,5 +27,7 @@ namespace ActionTrakingSystem.Model
         public decimal idealScore { get; set; }
         public int durationUnit { get; set; }
         public int lagUnit { get; set; }
+        public int displayOrder { get; set; }
+        
     }
 }

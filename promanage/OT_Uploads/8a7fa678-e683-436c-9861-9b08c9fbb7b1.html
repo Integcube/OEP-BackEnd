@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Demo</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-5">
+  <h1>API Demo</h1>
+  <div id="table-container" class="mt-3"></div>
+</div>
+
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+// $(document).ready(function(){
+//   // Get the parameter value from the URL
+//   var urlParams = new URLSearchParams(window.location.search);
+//   var guid = urlParams.get('guid');
+
+//   // Make AJAX call
+//   $.ajax({
+//     url: 'https://www.integcubes.com/api/data', // Your API endpoint
+//     type: 'GET',
+//     data: { guid: guid },
+//     success: function(response) {
+//       // Populate data into Bootstrap table
+//       var tableHtml = '<table class="table"><thead><tr><th>ID</th><th>Name</th><th>Email</th></tr></thead><tbody>';
+//       $.each(response, function(index, item) {
+//         tableHtml += '<tr><td>' + item.id + '</td><td>' + item.name + '</td><td>' + item.email + '</td></tr>';
+//       });
+//       tableHtml += '</tbody></table>';
+//       $('#table-container').html(tableHtml);
+//     },
+//     error: function(xhr, status, error) {
+//       console.error('Error:', error);
+//     }
+//   });
+// });
+// </script>
+<script>
+  $(document).ready(function(){
+    // Get the parameter value from the URL
+    var urlParams = new URLSearchParams(window.location.search);
+    var guid = urlParams.get('guid');
+  
+    // Dummy data for demonstration
+    var dummyData = [
+      { id: 1, name: 'John Doe', email: 'john@example.com' },
+      { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
+      { id: 3, name: 'Alice Johnson', email: 'alice@example.com' }
+    ];
+  
+    // Simulate AJAX call
+    setTimeout(function() {
+      // Populate data into Bootstrap table
+      var tableHtml = '<table class="table"><thead><tr><th>ID</th><th>Name</th><th>Email</th></tr></thead><tbody>';
+      $.each(dummyData, function(index, item) {
+        tableHtml += '<tr><td>' + item.id + '</td><td>' + item.name + '</td><td>' + item.email + '</td></tr>';
+      });
+      tableHtml += '</tbody></table>';
+      $('#table-container').html(tableHtml);
+    }, 1000); // Simulating a delay of 1 second (1000 milliseconds)
+  });
+  </script>
+  
+</body>
+</html>

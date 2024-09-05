@@ -194,6 +194,13 @@ namespace ActionTrakingSystem.Model
         public DbSet<ProjectReadiness> ProjectReadiness { get; set; }
         public DbSet<ProjectReadinessDTO> ProjectReadinessDTO { get; set; }
         public DbSet<ProjectReadinessDocument> ProjectReadinessDocument { get; set; }
-        
+
+
+        // Pre Insurance Recommendation
+        public DbSet<PreInsuranceRecommendation> PreInsuranceRecommendations { get; set; }
+        public DbSet<PreInsuranceRecommendationAction> PreInsuranceRecommendationActions { get; set; }
+        public DbSet<PreAssignInsuranceRecommendation> PreAssignInsuranceRecommendations { get; set; }
+
+
     }
 }

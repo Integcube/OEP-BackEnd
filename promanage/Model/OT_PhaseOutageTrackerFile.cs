@@ -17,5 +17,7 @@ namespace ActionTrakingSystem.Model
         public int createdBy { get; set; }
         public DateTime createdOn { get; set; }
         public int isDeleted { get; set; }
+        public int potId { get; set; }
+        
     }
 }

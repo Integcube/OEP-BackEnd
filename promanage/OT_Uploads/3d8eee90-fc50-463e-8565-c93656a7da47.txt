@@ -1,0 +1,179 @@
+    //$scope.CashFlow = {
+
+    //    "FromDate": new Date().toJSON(),
+    //    "ToDate": new Date().toJSON(),
+    //    "LocName": "",
+    //    "TagId": -1,
+    //    "Tag": "",
+    //    "TagName": "",
+    //    "OrgTitle": "",
+    //    "CostCntrId": -1,
+    //    "CostCntr": "",
+    //    "LocationList": [],
+    //    "RptId": 1,
+    //    "DateType": 2,
+    //    "RptName": "",
+    //    "RptTypeId": $rootScope.enums.rpt.cF,
+    //    "DateRange": "",
+    //}
+
+
+    //$scope.CashFlow.FromDate = $filter('date')($scope.CashFlow.FromDate, 'dd-MMM-yyyy');
+    //$scope.CashFlow.ToDate = $filter('date')($scope.CashFlow.ToDate, 'dd-MMM-yyyy');
+
+    //$scope.CostCenterList = [];
+
+    //$scope.dateOptions = {
+    //    formatYear: 'yy',
+    //    startingDay: 1,
+    //    class: 'datepicker'
+    //};
+    //$scope.initDate = new Date().toJSON();
+    //$scope.format = 'dd-MMM-yyyy';
+    //$scope.BankAccountList = [];
+    //$scope.Init = function () {
+
+    //    $scope.ViewMode = 'NV';
+    //    $scope.LoadOrgLocation();
+    //    $scope.LoadAnalysisTag();
+    //    $scope.LoadCostCenter();
+    //};
+    //$scope.ServLocationSettings = {
+    //    scrollableHeight: '250px',
+    //    scrollable: true,
+    //    enableSearch: true,
+    //    displayProp: 'Title',
+    //    idProp: 'LocId',
+    //    externalIdProp: 'LocId'
+
+    //};
+
+    //$scope.ReportList = [
+    //   { Title: "Summary", Id: 1 },
+    //   { Title: "Comparative Summary", Id: 2 },
+    //   { Title: "Location Wise Summary", Id: 4 },
+    //   { Title: "Detail", Id: 3 },
+
+    //]
+    //$scope.DateTypeList = [
+    //   { Title: "ToDate", Id: 1 },
+    //   { Title: "Duration", Id: 2 },
+    //]
+    //$scope.LoadOrgLocation = function () {
+    //    $http({ method: "GET", url: "Api/OrgLocation?unsp=1" })
+    //        .success(function (data, status, headers, config) {
+    //            $scope.OrgLocationList = data;
+    //            angular.forEach($scope.OrgLocationList, function (item) {
+    //                var ab = { "LocId": item.LocId };
+    //                $scope.CashFlow.LocationList.push(ab);
+    //            })
+
+    //        }).error(function (data, status, headers, config) {
+    //            $rootScope.throwerr(data);
+    //        });
+    //}
+
+    //$scope.LoadAnalysisTag = function () {
+    //    $http({ method: "GET", url: "Api/AccCAnalysisTag" })
+    //        .success(function (data, status, headers, config) {
+    //            $scope.TagList = data;
+
+    //        }).error(function (data, status, headers, config) {
+    //            $rootScope.throwerr(data);
+    //        });
+    //};
+    //$scope.LoadCostCenter = function () {
+    //    $http({ method: "GET", url: "Api/AccCCostCenter" })
+    //        .success(function (data, status, headers, config) {
+    //            $scope.CostCenterList = data;
+
+    //        }).error(function (data, status, headers, config) {
+    //            $rootScope.throwerr(data);
+    //        });
+    //};
+
+    //$scope.ReportView = function (type) {
+    //    $scope.CashFlow.FromDate = $filter('date')($scope.CashFlow.FromDate, 'dd-MMM-yyyy');
+    //    $scope.CashFlow.ToDate = $filter('date')($scope.CashFlow.ToDate, 'dd-MMM-yyyy');
+    //    var Title = "";
+
+    //    if ($scope.CashFlow.LocationList.length > 2)
+    //        $scope.CashFlow.LocName = ', All:' + $scope.CashFlow.LocationList.length + " Branches";
+    //    else {
+    //        for (var a = 0; a < $scope.CashFlow.LocationList.length; a++) {
+    //            if (a < 2) {
+    //                var locfound = $scope.OrgLocationList.filter(function (x) { return x.LocId == $scope.CashFlow.LocationList[a].LocId });
+
+    //                Title = Title + "," + locfound[0].Title;
+    //                $scope.CashFlow.LocName = Title;
+    //            }
+    //        }
+    //    }
+
+
+    //    $scope.CashFlow.TagId = -1;
+    //    if ($scope.CashFlow.Tag != "") {
+    //        var foundPydTag = $scope.TagList.filter(function (x) { return x.TagId == $scope.CashFlow.Tag.TagId; });
+    //        if (foundPydTag.length > 0) {
+    //            $scope.CashFlow.TagId = foundPydTag[0].TagId;
+    //        }
+    //        else {
+    //            $rootScope.toaster.pop('alert', 'Alert', "Please select Valid Analysis Tag");
+    //            return;
+    //        }
+    //    }
+    //    $scope.CashFlow.CostCntrId = -1;
+    //    if ($scope.CashFlow.CostCntr != "") {
+    //        var foundCst = $scope.CostCenterList.filter(function (x) { return x.CostCntrId == $scope.CashFlow.CostCntr.CostCntrId; });
+    //        if (foundCst.length > 0) {
+    //            $scope.CashFlow.CostCntrId = foundCst[0].CostCntrId;
+    //        }
+    //        else {
+    //            $rootScope.toaster.pop('alert', 'Alert', "Please select Valid Cost center");
+    //            return;
+    //        }
+    //    }
+
+    //    $scope.CashFlow.RptName = $scope.ReportList.filter(function (x) { return x.Id == $scope.CashFlow.RptId; })[0].Title;
+    //    if (type == 4) {
+    //        $scope.CashFlow.RptName = "Cash Flow Summary";
+    //        $scope.CashFlow.DateRange = "Date Range: " + $filter('date')($scope.CashFlow.FromDate, 'dd-MMM-yyyy') + ' to ' + $filter('date')($scope.CashFlow.ToDate, 'dd-MMM-yyyy');
+    //        $rootScope.openXLSByPost('ReportXLS/ExportReviewSummary', { Selected: $scope.CashFlow });
+    //    }
+    //    else {
+    //        var url = 'Accounts/Report/CashFlow?obj=' + JSON.stringify($scope.CashFlow).replaceAll('&', '•');
+    //        if (type == 1)
+    //            $rootScope.openPDFReportByURL(url);
+    //        else
+    //            $rootScope.openXLSReportByURL(url);
+    //    }
+    //};
+
+    //$scope.perventFormsubmition = function (evt) {
+    //    if (evt.which == 13) {
+    //        evt.preventDefault();
+    //        return;
+    //    }
+    //}
+
+
+
+    //$scope.openStart = function ($event) {
+
+    //    $event.preventDefault();
+    //    $event.stopPropagation();
+    //    $scope.openedstartdate = true;
+    //};
+    //$scope.openTo = function ($event) {
+
+    //    $event.preventDefault();
+    //    $event.stopPropagation();
+    //    $scope.openedTodate = true;
+    //};
+
+
+
+
+    //$scope.Init();
+
+

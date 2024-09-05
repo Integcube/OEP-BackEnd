@@ -151,7 +151,8 @@ namespace ActionTrakingSystem.Controllers
                                       join a in _context.ProjectStartPlan on pl.planId equals a.planId
                                       join plnt in _context.Sites on a.siteId equals plnt.siteId
                                       join cl in _context.Cluster on plnt.clusterId equals cl.clusterId
-                                      join reg in _context.Regions2 on plnt.region2 equals reg.regionId
+                                      join reg in _context.Regions2 on plnt.region2 equals reg.regionId into aa
+                                      from aaa in aa.DefaultIfEmpty()
                                       select new
                                       {
                                           a.id,
@@ -163,7 +164,7 @@ namespace ActionTrakingSystem.Controllers
                                           a.createdBy,
                                           site = plnt.siteName,
                                           plan = pl.title,
-                                          region = reg.title,
+                                          region = aaa.title,
                                           cluster = cl.clusterTitle
                                       }).FirstOrDefaultAsync();
 
@@ -247,7 +248,7 @@ namespace ActionTrakingSystem.Controllers
                     task.phaseId = reg.phaseId;
                     task.taskParentId = -1;
                     task.planId= reg.planId;
-                   
+                    task.displayOrder = reg.taskdisplayOrder;
                     task.duration= reg.duration;
                     task.createdBy = reg.createdBy;
                     task.createdOn = DateTime.Now;
@@ -276,10 +277,11 @@ namespace ActionTrakingSystem.Controllers
                     task.predecessorId = reg.predecessorId;
                     task.lagDays = reg.lagDays;
                     task.predecessorType = reg.predecessorType;
+                    task.displayOrder = reg.taskdisplayOrder;
                     task.durationUnit = reg.durationUnit;
                     task.lagUnit = reg.lagUnit;
                     _context.SaveChanges();
-
+                    await _context.Database.ExecuteSqlRawAsync("EXEC dbo.UpdatePhaseWeightageAndGenerateTaskCodes @PlanId, @PhaseId", new SqlParameter("@PlanId", task.planId), new SqlParameter("@PhaseId", task.phaseId));
                 }
                 return Ok(reg);
 
@@ -313,6 +315,7 @@ namespace ActionTrakingSystem.Controllers
                     task.predecessorType = reg.predecessorType;
                     task.durationUnit = reg.durationUnit;
                     task.lagUnit = reg.lagUnit;
+                    task.displayOrder = reg.taskdisplayOrder;
                     _context.Add(task);
                     _context.SaveChanges();
 
@@ -333,8 +336,9 @@ namespace ActionTrakingSystem.Controllers
                     task.predecessorType = reg.predecessorType;
                     task.durationUnit = reg.durationUnit;
                     task.lagUnit = reg.lagUnit;
-                    _context.SaveChanges(); 
-
+                    task.displayOrder = reg.taskdisplayOrder;
+                    _context.SaveChanges();
+                    await _context.Database.ExecuteSqlRawAsync("EXEC dbo.UpdatePhaseWeightageAndGenerateTaskCodes @PlanId, @PhaseId", new SqlParameter("@PlanId", task.planId), new SqlParameter("@PhaseId", task.phaseId));
                 }
                 return Ok(reg);
 
