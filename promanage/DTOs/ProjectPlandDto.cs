@@ -59,7 +59,8 @@ namespace ActionTrakingSystem.DTOs
         public int predecessorType { get; set; }
         public int durationUnit { get; set; }
         public int lagUnit { get; set; }
-
+        public int taskdisplayOrder { get; set; }
+        
 
     }
     public class ProjectPlanSubTaskDto
@@ -78,7 +79,8 @@ namespace ActionTrakingSystem.DTOs
         public int predecessorType { get; set; }
         public int durationUnit { get; set; }
         public int lagUnit { get; set; }
-
+        public int taskdisplayOrder { get; set;}
+        
     }
 
 
@@ -150,6 +152,7 @@ namespace ActionTrakingSystem.DTOs
         public string? lagDaysWithunit { get; set; }
         public decimal? idealScore { get; set; }
         public int? displayOrder { get; set; }
+        public int? taskdisplayOrder { get; set; }
         
     }
 

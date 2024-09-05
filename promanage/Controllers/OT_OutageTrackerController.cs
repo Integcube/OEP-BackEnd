@@ -38,7 +38,9 @@ namespace ActionTrakingSystem.Controllers
                                           d.userName,
                                           name = d.firstName + " " + d.lastName,
                                       }).Distinct().ToListAsync();
-                var outageData = await (from a in _context.OT_PhaseOutageTrackerProgress.Where(a => a.potId == reg.action.potId && a.monthId == reg.action.startDate.Month && a.yearId == reg.action.startDate.Year)
+
+                var outageData = await (from a in _context.OT_PhaseOutageTrackerProgress.Where(a => a.potId == reg.action.potId ) //&& a.monthId == reg.action.startDate.Month && a.yearId == reg.action.startDate.Year
+                                        orderby a.potId descending
                                         select new
                                         {
                                             a.monthId,
@@ -48,24 +50,25 @@ namespace ActionTrakingSystem.Controllers
                                             a.progressId,
                                         }).FirstOrDefaultAsync();
                 List<OT_DateCalc> monthList = new List<OT_DateCalc>();
-                var monthDifference = CalculateMonthDifference(reg.action.startDate, reg.action.endDate);
-                if (monthDifference == 0)
-                {
-                    OT_DateCalc c = new OT_DateCalc();
-                    c.date = reg.action.startDate;
-                    c.monthId = reg.action.startDate.Month + "-" + reg.action.startDate.Year;
-                    monthList.Add(c);
-                }
-                else
-                {
-                    for (var i = 0; i < monthDifference; i++)
-                    {
-                        OT_DateCalc c = new OT_DateCalc();
-                        c.date = reg.action.startDate.AddMonths(i);
-                        c.monthId = c.date.Month + "-" + c.date.Year;
-                        monthList.Add(c);
-                    }
-                }
+
+                //var monthDifference = CalculateMonthDifference(reg.action.startDate, reg.action.endDate);
+                //if (monthDifference == 0)
+                //{
+                //    OT_DateCalc c = new OT_DateCalc();
+                //    c.date = reg.action.startDate;
+                //    c.monthId = reg.action.startDate.Month + "-" + reg.action.startDate.Year;
+                //    monthList.Add(c);
+                //}
+                //else
+                //{
+                //    for (var i = 0; i < monthDifference; i++)
+                //    {
+                //        OT_DateCalc c = new OT_DateCalc();
+                //        c.date = reg.action.startDate.AddMonths(i);
+                //        c.monthId = c.date.Month + "-" + c.date.Year;
+                //        monthList.Add(c);
+                //    }
+                //}
 
                 var obj = new
                 {
@@ -95,7 +98,7 @@ namespace ActionTrakingSystem.Controllers
                     month = int.Parse(parts[0]);
                     year = int.Parse(parts[1]);
                 }
-                var outageData = await (from a in _context.OT_PhaseOutageTrackerProgress.Where(a => a.potId == reg.potId && a.monthId == month && a.yearId == year)
+                var outageData = await (from a in _context.OT_PhaseOutageTrackerProgress.Where(a => a.potId == reg.potId ) //&& a.monthId == month && a.yearId == year
                                         select new
                                         {
                                             a.monthId,
@@ -536,6 +539,7 @@ namespace ActionTrakingSystem.Controllers
                     ot.phaseId = Convert.ToInt32(reg.phaseId);
                     ot.outageDate = DateTime.Parse(reg.outageDate);
                     ot.phaseReadId = Convert.ToInt32(reg.phaseReadId);
+                    ot.potId = Convert.ToInt32(reg.potId);
                     ot.fileName = reg.fileName;
                     ot.remarks = reg.remarks;
                     ot.createdBy = Convert.ToInt32(reg.userId);
@@ -557,7 +561,7 @@ namespace ActionTrakingSystem.Controllers
         {
             try
             {
-                var files = await (from a in _context.OT_PhaseOutageTrackerFile.Where(a => a.equipmentId == reg.action.equipmentId && a.phaseId == reg.action.phaseId && a.phaseReadId == reg.action.phaseReadId && a.outageDate == reg.action.nextOutageDate && a.isDeleted == 0)
+                var files = await (from a in _context.OT_PhaseOutageTrackerFile.Where(a => a.equipmentId == reg.action.equipmentId && a.phaseId == reg.action.phaseId && a.phaseReadId == reg.action.phaseReadId && a.potId == reg.action.potId && a.isDeleted == 0)
                                    select new
                                    {
                                        a.fileId,

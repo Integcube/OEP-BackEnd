@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signup Form</title>
+<style>
+
+  #passwordError {
+    color: red;
+  }
+  #errorMessage{
+    color: red !important;
+  }
+  #successMessage{
+    color: #45a049 !important;
+  }
+  .error{
+    color: red;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  #signupForm {
+    width: 100%;
+    padding: 10px;
+  }
+
+ 
+  label {
+    font-weight: bold;
+    color: #333333;
+    display: block;
+   margin-top: 5px;
+  }
+
+  input {
+    padding: 10px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 16px;
+    height: 30px;
+    margin-bottom: 6px;
+    margin-top: 2px;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: #66afe9;
+  }
+
+  #domainAvailability {
+    margin-top: 5px;
+    font-style: italic;
+    color: #999999;
+  }
+
+  #passwordError {
+    color: #ff0000;
+    font-size: 14px;
+  }
+
+  #signupButton {
+    padding: 10px;
+    background-color: #4CAF50;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  
+  }
+
+  #signupButton:hover {
+    background-color: #45a049;
+  }
+
+  #successMessage, #errorMessage {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+
+</style>
+</head>
+<body>
+<form id="signupForm">
+  <label for="FirstName">First Name</label>
+  <input type="text" id="FirstName" name="FirstName" required><br>
+  
+  <label for="LastName">Last Name</label>
+  <input type="text" id="LastName" name="LastName"><br>
+  
+  <label for="Email">Email</label>
+  <input type="email" id="Email" name="Email" required><br>
+
+  <label for="Company">Company Name</label>
+  <input type="text" id="Company" name="Company" required><br>
+
+  <label for="Company">Domain</label>
+  <input type="text" id="Domain" name="Domain" required>
+ 
+  <div id="domainAvailability"></div>
+  <label for="password">Password</label>
+  <input type="password" id="password" name="password" required><br>
+
+  <label for="confirmPassword">Confirm Password</label>
+  <input type="password" id="confirmPassword" name="confirmPassword" required><br>
+  
+ <span id="passwordErrormatch" class="error"></span><br>
+  
+  <span id="passwordError" class="error"></span><br>
+  
+  <button type="submit" id="signupButton">Signup</button>
+
+  <div id="successMessage"></div>
+  <div id="errroMessage"></div>
+</form>
+
+<script>
+
+document.getElementById("Domain").addEventListener("input", function(event) {
+  
+    var formData = {
+      subdomain:  event.target.value
+      
+    };
+    fetch(`https://localhost:7020/api/Tenant/checkTenant`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        const domainAvailability = document.getElementById("domainAvailability");
+        domainAvailability.style.color = data? "red" : "green";
+        const domainStatus = data ? "not-available" : "available";
+      const domainMessage = data ? "Not available" : "Available";
+
+      domainAvailability.innerHTML = `<span class="domain-status-${domainStatus}"></span>`;
+      domainAvailability.innerHTML += event.target.value + ".myquantus.com " + domainMessage;
+      document.getElementById("signupButton").hidden = data;
+      })
+      .catch(error => {
+        console.error('Error checking domain availability:', error);
+        const domainAvailability = document.getElementById("domainAvailability");
+        domainAvailability.innerText = "Error checking domain availability";
+        domainAvailability.style.color = "red";
+      });
+  });
+
+  document.getElementById("signupForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+    
+    var formData = {
+      FirstName: document.getElementById("FirstName").value,
+      LastName: document.getElementById("LastName").value,
+      Email: document.getElementById("Email").value,
+      Company: document.getElementById("Company").value,
+      Domain: document.getElementById("Domain").value,
+      password: document.getElementById("password").value
+    };
+   debugger
+  var confirmPassword = document.getElementById('confirmPassword').value;
+   if(formData.password==confirmPassword){
+    document.getElementById("signupButton").disabled = true;
+    fetch('https://localhost:7020/api/Account/newTenant', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    })
+    .then(response => {
+      debugger
+      if (!response.ok) {
+        document.getElementById("errroMessage").innerText = "Something went wrong. Kindly contact the Quantas team for assistance.";
+      document.getElementById("errroMessage").style.display = "block";
+      }
+      return response.json();
+    })
+    .then(data => {
+      document.getElementById("signupForm").reset();
+    document.getElementById("successMessage").innerText = "Login URL have been sent to your "+ formData.Email+ " email. Kindly Check Your Email.";
+    document.getElementById("successMessage").style.display = "block";
+    document.getElementById("errroMessage").style.display = "none";
+    })
+    .catch((error) => {
+      document.getElementById("errroMessage").innerText = "Something went wrong. Kindly contact the Quantas team for assistance.";
+      document.getElementById("errroMessage").style.display = "block";
+    })
+    .finally(() => {
+      // Enable the button after 3 seconds
+      setTimeout(function() {
+        document.getElementById("signupButton").disabled = false;
+      
+      }, 2000);
+    });
+   }
+    
+  
+
+  });
+ 
+
+  var typingTimer;
+        var doneTypingInterval = 1000; // 1 second
+
+        var passwordInput = document.getElementById('password');
+        var passwordError = document.getElementById('passwordError');
+
+        passwordInput.addEventListener('input', function () {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(validatePassword, doneTypingInterval);
+        });
+
+        function validatePassword() {
+            var password = passwordInput.value;
+            var isValid = true;
+            var errorMessages = [];
+
+            // Check if password meets ASP.NET Core Identity password policy
+            if (password.length < 6) {
+                errorMessages.push('Password must be at least 6 characters long.\n');
+                isValid = false;
+            }
+
+            if (!/[a-z]/.test(password)) {
+                errorMessages.push('Password must contain at least one lowercase letter.\n');
+                isValid = false;
+            }
+
+            if (!/[A-Z]/.test(password)) {
+                errorMessages.push('Password must contain at least one uppercase letter.\n');
+                isValid = false;
+            }
+
+            if (!/\d/.test(password)) {
+                errorMessages.push('Password must contain at least one digit.\n');
+                isValid = false;
+            }
+
+            if (!/[^a-zA-Z0-9]/.test(password)) {
+                errorMessages.push('Password must contain at least one special character.\n');
+                isValid = false;
+            }
+
+            // Display error messages if any
+            if (errorMessages.length > 0) {
+                passwordError.innerText = errorMessages.join(' ');
+                document.getElementById("signupButton").disabled = true;
+            } else {
+                passwordError.innerText = '';
+                document.getElementById("signupButton").disabled = false;
+            }
+
+            return isValid;
+        }
+
+
+
+
+var confirmPassword = document.getElementById('confirmPassword');
+var passwordErrormatch = document.getElementById('passwordErrormatch');
+
+confirmPassword.addEventListener('input', function () {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(mathpassword, doneTypingInterval);
+});
+
+
+function mathpassword() {
+debugger
+  
+  var password = document.getElementById('password').value;
+  var confirmPassword = document.getElementById('confirmPassword').value;
+  var passwordErrormatch = document.getElementById('passwordErrormatch');
+  
+  if (password !== confirmPassword) {
+    passwordErrormatch.textContent = 'Passwords do not match';
+    return;
+  }else{
+    passwordErrormatch.textContent = '';
+  }
+
+}
+        
+  </script>
+</body>
+</html>
